@@ -3,7 +3,7 @@ const router = require("express").Router();
 const jwt = require('jsonwebtoken');
 
 const Users = require("../users/model");
-const secrets = require('../config/secrets')
+const { jwtSecret } = require("../config/secrets.js");
 
 router.post("/register", (req, res) => {
   let user = req.body;
@@ -47,13 +47,11 @@ function generateToken(user){
         subject: user.id,
         username: user.username,
     }
-    const secret = 'keep it sleazy';
-
     const options = {
         expiresIn: '8h',
     }
 
-    return jwt.sign(payload, secret, options)
+    return jwt.sign(payload, jwtSecret, options)
 }
 
 router.get("/logout", (req, res) => {

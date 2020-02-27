@@ -1,10 +1,27 @@
-module.exports = (req, res, next) => {
+const jwt = require("jsonwebtoken"); // <<< install this npm package
 
-    if(req.session && req.session.loggedIn) {
+const { jwtSecret } = require("../config/secrets");
+
+module.exports = (req, res, next) => {
+  const { authorization } = req.headers;
+
+  if (authorization) {
+    jwt.verify(authorization, jwtSecret, (err, decodedToken) => {
+      if (err) {
+        res.status(401).json({ message: "Invalid Credentials" });
+      } else {
+        req.decodedToken = decodedToken;
+
+        next();
+      }
+    });
+  } else {
+    res.status(400).json({ message: "No credentials provided" });
+  }
+};
+/*
+if(req.session && req.session.loggedIn) {
       next();
     } else {
       res.status(401).json({ Pirate: "NAY!!" });
-    }
-
-};
-    
+    }*/
